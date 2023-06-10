@@ -2,61 +2,13 @@
 
     static void Main(string[] args) {
         int[] numbers = RequestEnterNumbers();
+        int[] currentMatrix = new int[9];
+        bool[] numberUsed = new bool[9];
 
         long maxDeterminant = long.MinValue;
         int[] maxDeterminantMatrix = new int[9];
 
-        for (byte a = 0; a < 9; a++) {
-            for (byte b = 0; b < 9; b++) {
-                if (b == a) continue;
-
-                for (byte c = 0; c < 9; c++) {
-                    if (c == a || c == b) continue;
-
-                    for (byte d = 0; d < 9; d++) {
-                        if (d == a || d == b || d == c) continue;
-
-                        for (byte e = 0; e < 9; e++) {
-                            if (e == a || e == b || e == c || e == d) continue;
-
-                            for (byte f = 0; f < 9; f++) {
-                                if (f == a || f == b || f == c || f == d || f == e) continue;
-
-                                for (byte g = 0; g < 9; g++) {
-                                    if (g == a || g == b || g == c || g == d || g == e || g == f) continue;
-
-                                    for (byte h = 0; h < 9; h++) {
-                                        if (h == a || h == b || h == c || h == d || h == e || h == f || h == g) continue;
-
-                                        for (byte i = 0; i < 9; i++) {
-                                            if (i == a || i == b || i == c || i == d || i == e || i == f || i == g || i == h) continue;
-
-                                            int[] matrix = new int[9];
-                                            matrix[0] = numbers[a];
-                                            matrix[1] = numbers[b];
-                                            matrix[2] = numbers[c];
-                                            matrix[3] = numbers[d];
-                                            matrix[4] = numbers[e];
-                                            matrix[5] = numbers[f];
-                                            matrix[6] = numbers[g];
-                                            matrix[7] = numbers[h];
-                                            matrix[8] = numbers[i];
-
-                                            long determinant = CalculateDeterminant(matrix);
-
-                                            if (determinant > maxDeterminant) {
-                                                maxDeterminant = determinant;
-                                                maxDeterminantMatrix = matrix;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        GenerateMatrix(numbers, currentMatrix, numberUsed, 0, ref maxDeterminant, ref maxDeterminantMatrix);
 
         PrintMatrixWithMaxDeterminant(maxDeterminantMatrix, maxDeterminant);
     }
@@ -87,6 +39,29 @@
         }
 
         return numbers;
+    }
+
+    static void GenerateMatrix(int[] numbers, int[] currentMatrix, bool[] numberUsed, byte index, ref long maxDeterminant, ref int[] maxDeterminantMatrix) {
+
+        if (index == 9) {
+            long determinant = CalculateDeterminant(currentMatrix);
+
+            if (determinant > maxDeterminant) {
+                maxDeterminant = determinant;
+                maxDeterminantMatrix = currentMatrix.ToArray();
+            }
+
+            return;
+        }
+
+        for (byte i = 0; i < 9; i++) {
+            if (!numberUsed[i]) {
+                currentMatrix[index] = numbers[i];
+                numberUsed[i] = true;
+                GenerateMatrix(numbers, currentMatrix, numberUsed, (byte)(index + 1), ref maxDeterminant, ref maxDeterminantMatrix);
+                numberUsed[i] = false;
+            }
+        }
     }
 
     static long CalculateDeterminant(int[] matrix) {
